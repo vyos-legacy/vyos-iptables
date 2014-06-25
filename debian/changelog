@@ -1,3 +1,9 @@
+iptables (1.4.20+vyos1+helium4) unstable; urgency=low
+
+  * Fix maintainer address.
+
+ -- Daniil Baturin <daniil@baturin.org>  Wed, 25 Jun 2014 15:47:13 +0200
+
 iptables (1.4.20+vyos1+helium3) unstable; urgency=low
 
   * Force release to fix versions
