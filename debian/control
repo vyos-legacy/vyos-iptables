@@ -1,7 +1,7 @@
 Source: iptables
 Section: net
 Priority: important
-Maintainer: Vyatta Package Maintainers <maintainers@vyatta.com>
+Maintainer: VyOS Package Maintainers <maintainers@vyos.net>
 Build-Depends: debhelper (>>7.0), autoconf, automake, libtool
 Standards-Version: 3.8.2
 Homepage: http://www.netfilter.org/
