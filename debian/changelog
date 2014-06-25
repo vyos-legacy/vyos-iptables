@@ -1,3 +1,9 @@
+iptables (1.4.20+vyos1+helium3) unstable; urgency=low
+
+  * Force release to fix versions
+
+ -- Daniil Baturin <daniil@baturin.org>  Wed, 25 Jun 2014 15:39:08 +0200
+
 iptables (1.4.20+vyos1+helium2) unstable; urgency=low
 
   * Update to 1.4.20 from the upstream.
