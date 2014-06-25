@@ -1,0 +1,2 @@
+iptables: package-name-doesnt-match-sonames
+iptables: binary-without-manpage
