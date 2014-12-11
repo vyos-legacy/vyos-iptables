@@ -1,3 +1,9 @@
+iptables (1.4.10+vyos2+lithium1) unstable; urgency=low
+
+  * New branch
+
+ -- Alex Harpin <development@landsofshadow.co.uk>  Thu, 11 Dec 2014 15:33:13 +0000
+ 
 iptables (1.4.20+vyos1+helium4) unstable; urgency=low
 
   * Fix maintainer address.
