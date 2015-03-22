@@ -1,4 +1,4 @@
-.TH IPTABLES-RESTORE 8 "Jan 04, 2001" "" ""
+.TH IPTABLES-SAVE 8 "" "@PACKAGE_STRING@" "@PACKAGE_STRING@"
 .\"
 .\" Man page written by Harald Welte <laforge@gnumonks.org>
 .\" It is based on the iptables man page.
@@ -19,45 +19,43 @@
 .\"
 .\"
 .SH NAME
-iptables-restore \(em Restore IP Tables
+iptables-save \(em dump iptables rules to stdout
+.P
+ip6tables-save \(em dump iptables rules to stdout
 .SH SYNOPSIS
-\fBiptables\-restore\fP [\fB\-chntv\fP] [\fB\-M\fP \fImodprobe\fP]
-[\fB\-T\fP \fIname\fP]
+\fBiptables\-save\fP [\fB\-M\fP \fImodprobe\fP] [\fB\-c\fP]
+[\fB\-t\fP \fItable\fP]
+.P
+\fBip6tables\-save\fP [\fB\-M\fP \fImodprobe\fP] [\fB\-c\fP]
+[\fB\-t\fP \fItable\fP
 .SH DESCRIPTION
 .PP
-.B iptables-restore
-is used to restore IP Tables from data specified on STDIN. Use 
-I/O redirection provided by your shell to read from a file
+.B iptables-save
+and
+.B ip6tables-save
+are used to dump the contents of IP or IPv6 Table in easily parseable format
+to STDOUT. Use I/O-redirection provided by your shell to write to a file.
 .TP
-\fB\-c\fR, \fB\-\-counters\fR
-restore the values of all packet and byte counters
-.TP
-\fB\-h\fP, \fB\-\-help\fP
-Print a short option summary.
-.TP
-\fB\-n\fR, \fB\-\-noflush\fR 
-don't flush the previous contents of the table. If not specified, 
-.B iptables-restore
-flushes (deletes) all previous contents of the respective table.
-.TP
-\fB\-t\fP, \fB\-\-test\fP
-Only parse and construct the ruleset, but do not commit it.
-.TP
-\fB\-v\fP, \fB\-\-verbose\fP
-Print additional debug info during ruleset processing.
-.TP
-\fB\-M\fP, \fB\-\-modprobe\fP \fImodprobe_program\fP
-Specify the path to the modprobe program. By default, iptables-restore will
+\fB\-M\fP \fImodprobe_program\fP
+Specify the path to the modprobe program. By default, iptables-save will
 inspect /proc/sys/kernel/modprobe to determine the executable's path.
 .TP
-\fB\-T\fP, \fB\-\-table\fP \fIname\fP
-Restore only the named table even if the input stream contains other ones.
+\fB\-c\fR, \fB\-\-counters\fR
+include the current values of all packet and byte counters in the output
+.TP
+\fB\-t\fR, \fB\-\-table\fR \fItablename\fP
+restrict output to only one table. If not specified, output includes all
+available tables.
 .SH BUGS
 None known as of iptables-1.2.1 release
-.SH AUTHOR
+.SH AUTHORS
 Harald Welte <laforge@gnumonks.org>
+.br
+Rusty Russell <rusty@rustcorp.com.au>
+.br
+Andras Kis-Szabo <kisza@sch.bme.hu> contributed ip6tables-save.
 .SH SEE ALSO
-\fBiptables\-save\fP(8), \fBiptables\fP(8)
+\fBiptables\-restore\fP(8), \fBiptables\fP(8)
 .PP
 The iptables-HOWTO, which details more iptables usage, the NAT-HOWTO,
 which details NAT, and the netfilter-hacking-HOWTO which details the

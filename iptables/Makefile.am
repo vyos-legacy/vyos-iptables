@@ -28,7 +28,7 @@ sbin_PROGRAMS    = xtables-multi
 man_MANS         = iptables.8 iptables-restore.8 iptables-save.8 \
                    iptables-xml.1 ip6tables.8 ip6tables-restore.8 \
                    ip6tables-save.8 iptables-extensions.8
-CLEANFILES       = iptables.8 ip6tables.8
+CLEANFILES       = iptables.8
 
 vx_bin_links   = iptables-xml
 if ENABLE_IPV4
@@ -38,7 +38,7 @@ if ENABLE_IPV6
 v6_sbin_links  = ip6tables ip6tables-restore ip6tables-save
 endif
 
-iptables-extensions.8: ${srcdir}/iptables-extensions.8.tmpl ../extensions/matches.man ../extensions/targets.man
+iptables-extensions.8: iptables-extensions.8.tmpl ../extensions/matches.man ../extensions/targets.man
 	${AM_VERBOSE_GEN} sed \
 		-e '/@MATCH@/ r ../extensions/matches.man' \
 		-e '/@TARGET@/ r ../extensions/targets.man' $< >$@;
