@@ -30,16 +30,18 @@ struct nft_handle {
 	struct mnl_socket	*nl;
 	uint32_t		portid;
 	uint32_t		seq;
-	struct list_head	rule_list;
-	int			rule_list_num;
+	struct list_head	obj_list;
+	int			obj_list_num;
 	struct mnl_nlmsg_batch	*batch;
 	struct nft_family_ops	*ops;
 	struct builtin_table	*tables;
 	bool			restore;
+	bool			batch_support;
 };
 
 extern struct builtin_table xtables_ipv4[TABLES_MAX];
 extern struct builtin_table xtables_arp[TABLES_MAX];
+extern struct builtin_table xtables_bridge[TABLES_MAX];
 
 int mnl_talk(struct nft_handle *h, struct nlmsghdr *nlh,
 	     int (*cb)(const struct nlmsghdr *nlh, void *data),
@@ -53,13 +55,9 @@ void nft_fini(struct nft_handle *h);
 struct nft_table;
 struct nft_chain_list;
 
-int nft_table_builtin_add(struct nft_handle *h, struct builtin_table *_t, bool dormant);
-struct builtin_table *nft_table_builtin_find(struct nft_handle *h, const char *table);
-int nft_table_add(struct nft_handle *h, const struct nft_table *t);
+int nft_table_add(struct nft_handle *h, struct nft_table *t, uint16_t flags);
 int nft_for_each_table(struct nft_handle *h, int (*func)(struct nft_handle *h, const char *tablename, bool counters), bool counters);
 bool nft_table_find(struct nft_handle *h, const char *tablename);
-int nft_table_set_dormant(struct nft_handle *h, const char *table);
-int nft_table_wake_dormant(struct nft_handle *h, const char *table);
 int nft_table_purge_chains(struct nft_handle *h, const char *table, struct nft_chain_list *list);
 
 /*
@@ -67,11 +65,7 @@ int nft_table_purge_chains(struct nft_handle *h, const char *table, struct nft_c
  */
 struct nft_chain;
 
-struct nft_chain *nft_chain_builtin_alloc(struct builtin_table *table, struct builtin_chain *chain, int policy);
-void nft_chain_builtin_add(struct nft_handle *h, struct builtin_table *table, struct builtin_chain *chain, int policy);
-struct builtin_chain *nft_chain_builtin_find(struct builtin_table *t, const char *chain);
-int nft_chain_builtin_init(struct nft_handle *h, const char *table, const char *chain, int policy);
-int nft_chain_add(struct nft_handle *h, const struct nft_chain *c);
+int nft_chain_add(struct nft_handle *h, struct nft_chain *c, uint16_t flags);
 int nft_chain_set(struct nft_handle *h, const char *table, const char *chain, const char *policy, const struct xt_counters *counters);
 struct nft_chain_list *nft_chain_dump(struct nft_handle *h);
 struct nft_chain *nft_chain_list_find(struct nft_chain_list *list, const char *table, const char *chain);
@@ -120,6 +114,8 @@ void nft_rule_print_save(const void *data,
 			 struct nft_rule *r, enum nft_rule_print type,
 			 unsigned int format);
 
+uint32_t nft_invflags2cmp(uint32_t invflags, uint32_t flag);
+
 /*
  * global commit and abort
  */
@@ -140,6 +136,8 @@ const char *nft_strerror(int err);
 int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table, bool restore);
 /* For xtables-arptables.c */
 int do_commandarp(struct nft_handle *h, int argc, char *argv[], char **table);
+/* For xtables-eb.c */
+int do_commandeb(struct nft_handle *h, int argc, char *argv[], char **table);
 
 /*
  * Parse config for tables and chain helper functions

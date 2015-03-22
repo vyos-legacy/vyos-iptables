@@ -31,12 +31,12 @@ static const struct xt_option_entry devgroup_opts[] = {
 	XTOPT_TABLEEND,
 };
 
-/* array of devgroups from /etc/iproute2/group_map */
+/* array of devgroups from /etc/iproute2/group */
 static struct xtables_lmap *devgroups;
 
 static void devgroup_init(struct xt_entry_match *match)
 {
-	const char file[] = "/etc/iproute2/group_map";
+	const char file[] = "/etc/iproute2/group";
 	devgroups = xtables_lmap_init(file);
 	if (devgroups == NULL && errno != ENOENT)
 		fprintf(stderr, "Warning: %s: %s\n", file, strerror(errno));
@@ -124,7 +124,7 @@ static void devgroup_show(const char *pfx, const struct xt_devgroup_info *info,
 		if (info->flags & XT_DEVGROUP_INVERT_DST)
 			printf(" !");
 		printf(" %sdst-group ", pfx);
-		print_devgroup(info->src_group, info->src_mask, numeric);
+		print_devgroup(info->dst_group, info->dst_mask, numeric);
 	}
 }
 

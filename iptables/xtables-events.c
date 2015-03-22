@@ -27,6 +27,7 @@
 #include "iptables.h" /* for xtables_globals */
 #include "xtables-multi.h"
 #include "nft.h"
+#include "nft-arp.h"
 
 static int table_cb(const struct nlmsghdr *nlh, int type)
 {
@@ -34,15 +35,11 @@ static int table_cb(const struct nlmsghdr *nlh, int type)
 	char buf[4096];
 
 	t = nft_table_alloc();
-	if (t == NULL) {
-		perror("OOM");
+	if (t == NULL)
 		goto err;
-	}
 
-	if (nft_table_nlmsg_parse(nlh, t) < 0) {
-		perror("nft_table_nlmsg_parse");
+	if (nft_table_nlmsg_parse(nlh, t) < 0)
 		goto err_free;
-	}
 
 	nft_table_snprintf(buf, sizeof(buf), t, NFT_OUTPUT_DEFAULT, 0);
 	/* FIXME: define syntax to represent table events */
@@ -59,21 +56,17 @@ static bool counters;
 static int rule_cb(const struct nlmsghdr *nlh, int type)
 {
 	struct iptables_command_state cs = {};
-	struct arpt_entry fw_arp = {};
+	struct arptables_command_state cs_arp = {};
 	struct nft_rule *r;
 	void *fw = NULL;
 	uint8_t family;
 
 	r = nft_rule_alloc();
-	if (r == NULL) {
-		perror("OOM");
+	if (r == NULL)
 		goto err;
-	}
 
-	if (nft_rule_nlmsg_parse(nlh, r) < 0) {
-		perror("nft_rule_nlmsg_parse");
+	if (nft_rule_nlmsg_parse(nlh, r) < 0)
 		goto err_free;
-	}
 
 	family = nft_rule_attr_get_u32(r, NFT_RULE_ATTR_FAMILY);
 	switch (family) {
@@ -85,8 +78,8 @@ static int rule_cb(const struct nlmsghdr *nlh, int type)
 		break;
 	case NFPROTO_ARP:
 		printf("-0 ");
-		nft_rule_to_arpt_entry(r, &fw_arp);
-		fw = &fw_arp;
+		nft_rule_to_arptables_command_state(r, &cs_arp);
+		fw = &cs_arp;
 		break;
 	default:
 		goto err_free;
@@ -109,15 +102,11 @@ static int chain_cb(const struct nlmsghdr *nlh, int type)
 	char buf[4096];
 
 	t = nft_chain_alloc();
-	if (t == NULL) {
-		perror("OOM");
+	if (t == NULL)
 		goto err;
-	}
 
-	if (nft_chain_nlmsg_parse(nlh, t) < 0) {
-		perror("nft_chain_nlmsg_parse");
+	if (nft_chain_nlmsg_parse(nlh, t) < 0)
 		goto err_free;
-	}
 
 	nft_chain_snprintf(buf, sizeof(buf), t, NFT_OUTPUT_DEFAULT, 0);
 	/* FIXME: define syntax to represent chain events */
@@ -198,12 +187,12 @@ int xtables_events_main(int argc, char *argv[])
 
 	nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (nl == NULL) {
-		perror("mnl_socket_open");
+		perror("cannot open nfnetlink socket");
 		exit(EXIT_FAILURE);
 	}
 
 	if (mnl_socket_bind(nl, (1 << (NFNLGRP_NFTABLES-1)), MNL_SOCKET_AUTOPID) < 0) {
-		perror("mnl_socket_bind");
+		perror("cannot bind to nfnetlink socket");
 		exit(EXIT_FAILURE);
 	}
 
@@ -215,7 +204,7 @@ int xtables_events_main(int argc, char *argv[])
 		ret = mnl_socket_recvfrom(nl, buf, sizeof(buf));
 	}
 	if (ret == -1) {
-		perror("error");
+		perror("cannot receive from nfnetlink socket");
 		exit(EXIT_FAILURE);
 	}
 	mnl_socket_close(nl);

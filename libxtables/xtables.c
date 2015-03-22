@@ -168,6 +168,19 @@ static const struct xtables_afinfo afinfo_ipv6 = {
 	.so_rev_target = IP6T_SO_GET_REVISION_TARGET,
 };
 
+/* Dummy families for arptables-compat and ebtables-compat. Leave structure
+ * fields that we don't use unset.
+ */
+static const struct xtables_afinfo afinfo_bridge = {
+	.libprefix     = "libebt_",
+	.family        = NFPROTO_BRIDGE,
+};
+
+static const struct xtables_afinfo afinfo_arp = {
+	.libprefix     = "libarpt_",
+	.family        = NFPROTO_ARP,
+};
+
 const struct xtables_afinfo *afinfo;
 
 /* Search path for Xtables .so files */
@@ -223,6 +236,12 @@ void xtables_set_nfproto(uint8_t nfproto)
 		break;
 	case NFPROTO_IPV6:
 		afinfo = &afinfo_ipv6;
+		break;
+	case NFPROTO_BRIDGE:
+		afinfo = &afinfo_bridge;
+		break;
+	case NFPROTO_ARP:
+		afinfo = &afinfo_arp;
 		break;
 	default:
 		fprintf(stderr, "libxtables: unhandled NFPROTO in %s\n",
@@ -348,6 +367,11 @@ int xtables_insmod(const char *modname, const char *modprobe, bool quiet)
 		modprobe = buf;
 	}
 
+	argv[0] = (char *)modprobe;
+	argv[1] = (char *)modname;
+	argv[2] = quiet ? "-q" : NULL;
+	argv[3] = NULL;
+
 	/*
 	 * Need to flush the buffer, or the child may output it again
 	 * when switching the program thru execv.
@@ -356,19 +380,10 @@ int xtables_insmod(const char *modname, const char *modprobe, bool quiet)
 
 	switch (vfork()) {
 	case 0:
-		argv[0] = (char *)modprobe;
-		argv[1] = (char *)modname;
-		if (quiet) {
-			argv[2] = "-q";
-			argv[3] = NULL;
-		} else {
-			argv[2] = NULL;
-			argv[3] = NULL;
-		}
 		execv(argv[0], argv);
 
 		/* not usually reached */
-		exit(1);
+		_exit(1);
 	case -1:
 		free(buf);
 		return -1;
@@ -540,7 +555,7 @@ void xtables_parse_interface(const char *arg, char *vianame,
 static void *load_extension(const char *search_path, const char *af_prefix,
     const char *name, bool is_target)
 {
-	const char *all_prefixes[] = {"libxt_", af_prefix, NULL};
+	const char *all_prefixes[] = {af_prefix, "libxt_", NULL};
 	const char **prefix;
 	const char *dir = search_path, *next;
 	void *ptr = NULL;
@@ -1702,8 +1717,9 @@ static struct in6_addr *parse_ip6mask(char *mask)
 	if (bits != 0) {
 		char *p = (void *)&maskaddr;
 		memset(p, 0xff, bits / 8);
-		memset(p + (bits / 8) + 1, 0, (128 - bits) / 8);
-		p[bits/8] = 0xff << (8 - (bits & 7));
+		memset(p + ((bits + 7) / 8), 0, (128 - bits) / 8);
+		if (bits < 128)
+			p[bits/8] = 0xff << (8 - (bits & 7));
 		return &maskaddr;
 	}
 
