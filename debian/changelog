@@ -1,3 +1,10 @@
+iptables (1.4.21+vyos2+lithium4) unstable; urgency=low
+
+  [ Alex Harpin ]
+  * vyos-iptables: update dh_gencontrol to use new development build flag
+
+ -- Alex Harpin <development@landsofshadow.co.uk>  Thu, 02 Apr 2015 21:16:23 +0100
+ 
 iptables (1.4.21+vyos2+lithium3) unstable; urgency=low
 
   [ Alex Harpin ]
