@@ -1,3 +1,9 @@
+iptables (1.4.21+vyos2+current1) unstable; urgency=medium
+
+  * New branch
+
+ -- Kim Hagen <kim.sidney@gmail.com>  Sun, 24 Jan 2016 15:33:04 -0500
+
 iptables (1.4.21+vyos2+lithium4) unstable; urgency=low
 
   [ Alex Harpin ]
